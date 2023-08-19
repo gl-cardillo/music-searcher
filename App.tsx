@@ -1,49 +1,84 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View, TextInput, Image, ScrollView } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  Image,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { API_URL, API_TOKEN } from "@env";
+import { Icon } from "@rneui/base";
 
 export default function App() {
-  const [search, setSearch] = useState<string>("");
+  const [searchText, setSearchText] = useState<string>("");
 
   const [results, setResults] = useState<any>([]);
   const getData = async (search: string) => {
-    try {
-      const response = await axios.get(
-        `${API_URL}/search?q=${search}&type=album%2Cartist%2Ctrack`,
-        { headers: { Authorization: `Bearer ${API_TOKEN}` } }
-      );
-      const { artists } = response.data;
-      setResults(artists.items);
-    } catch (error) {
-      console.error(error);
+    setSearchText(search);
+    if (search !== "") {
+      try {
+        const response = await axios.get(
+          `${API_URL}/search?q=${search}&type=album%2Cartist%2Ctrack`,
+          { headers: { Authorization: `Bearer ${API_TOKEN}` } }
+        );
+        const { artists } = response.data;
+        setResults(artists.items);
+      } catch (error) {
+        console.error(error);
+      }
+    } else {
+      setResults([]);
     }
   };
   console.log(results[0]);
 
+  const handleClear = () => {
+    setSearchText("");
+    setResults([]);
+  };
+
   return (
     <View style={styles.container}>
-      <TextInput
-        style={styles.searchInput}
-        onChangeText={(txt) => getData(txt)}
-      />
-      
-      {results.length > 0 &&
-        results.map((result: any, i: number) => (
-          <View style={styles.resultContainer} key={i}>
-            <Image
-              style={styles.images}
-              source={{
-                uri: result.images[0]?.url,
-              }}
+      <View style={styles.searchContainer}>
+        <Icon name="search" color="white" style={styles.icon} />
+        <TextInput
+          style={styles.searchInput}
+          onChangeText={(txt) => getData(txt)}
+          value={searchText}
+          placeholder="Search.."
+        />
+        {searchText !== "" && (
+          <TouchableOpacity onPress={handleClear}>
+            <Icon
+              name="remove"
+              color="white"
+              type="font-awesome"
+              style={styles.icon}
             />
-            <View>
-              <Text style={styles.name}>{result.name}</Text>
-              <Text style={styles.type}>{result.type}</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+      <ScrollView style={styles.resultsContainer}>
+        {results.length > 0 &&
+          results.map((result: any, i: number) => (
+            <View style={styles.resultContainer} key={i}>
+              <Image
+                style={styles.images}
+                source={{
+                  uri: result.images[0]?.url,
+                }}
+              />
+              <View>
+                <Text style={styles.name}>{result.name}</Text>
+                <Text style={styles.type}>{result.type}</Text>
+              </View>
             </View>
-          </View>
-        ))}
+          ))}
+      </ScrollView>
     </View>
   );
 }
@@ -53,26 +88,43 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#2D2D30",
     alignItems: "center",
-    paddingTop: 100,
+    paddingTop: 70,
+  },
+  searchContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    width: "90%",
   },
   searchInput: {
-    borderWidth: 0.5,
-    width: 200,
-    height: 30,
-    padding: 10,
-    marginBottom: 20,
+    flex: 1,
+    paddingLeft: 8,
+    paddingRight: 30, // To make space for the clear icon
     color: "white",
-    borderColor: 'white',
-    borderRadius: 5
+    borderColor: "white",
+    height: 35,
+  },
+  icon: {
+    width: 24,
+    height: 24,
+    marginHorizontal: 4,
   },
   images: {
-    width: 50,
-    height: 50,
+    width: 60,
+    height: 60,
     borderRadius: 50,
   },
-  resultContainer: {
+  resultsContainer: {
+    width: '100%',
     marginTop: 15,
-    width: 250,
+  },
+  resultContainer: {
+    marginTop: 20,
+    width: "70%",
+    marginLeft: 20,
     display: "flex",
     flexDirection: "row",
     gap: 10,
@@ -82,6 +134,8 @@ const styles = StyleSheet.create({
   name: {
     fontWeight: "bold",
     color: "white",
+    fontSize: 16,
+    marginBottom: 5,
   },
   type: {
     color: "white",
