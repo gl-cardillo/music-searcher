@@ -12,36 +12,36 @@ import { useEffect, useState } from "react";
 import { API_URL, API_TOKEN } from "@env";
 import { Icon } from "@rneui/base";
 
-export const Search = () => {
-    const [searchText, setSearchText] = useState<string>("");
-    //console.log(API_TOKEN)
-    const [results, setResults] = useState<any>([]);
+export const Search = ({ navigation }: any) => {
+  const [searchText, setSearchText] = useState<string>("");
 
-    const getData = async (search: string) => {
-      const searchFormatted = search.replaceAll(" ", "+");
-      console.log(search);
-      setSearchText(search);
-      if (search !== "") {
-        try {
-          const response = await axios.get(
-            `${API_URL}/search?q=${searchFormatted}&type=album%2Cartist%2Ctrack`,
-            { headers: { Authorization: `Bearer ${API_TOKEN}` } }
-          );
-          const { artists } = response.data;
-          setResults(artists.items);
-        } catch (error) {
-          console.error(error);
-        }
-      } else {
-        setResults([]);
+  const [results, setResults] = useState<any>([]);
+
+  const getData = async (search: string) => {
+    const searchFormatted = search.replaceAll(" ", "+");
+    console.log(search);
+    setSearchText(search);
+    if (search !== "") {
+      try {
+        const response = await axios.get(
+          `${API_URL}/search?q=${searchFormatted}&type=album%2Cartist%2Ctrack`,
+          { headers: { Authorization: `Bearer ${API_TOKEN}` } }
+        );
+        const { artists } = response.data;
+        setResults(artists.items);
+      } catch (error) {
+        console.error(error);
       }
-    };
-    // console.log(results[0]);
-
-    const handleClear = () => {
-      setSearchText("");
+    } else {
       setResults([]);
-    };
+    }
+  };
+  // console.log(results[0]);
+
+  const handleClear = () => {
+    setSearchText("");
+    setResults([]);
+  };
   return (
     <View style={styles.container}>
       <View style={styles.searchContainer}>
@@ -67,30 +67,38 @@ export const Search = () => {
       <ScrollView style={styles.resultsContainer}>
         {results.length > 0 &&
           results.map((result: any, i: number) => (
-            <View style={styles.resultContainer} key={i}>
-              <Image
-                style={styles.images}
-                source={{
-                  uri: result.images[0]?.url,
-                }}
-              />
-              <View>
-                <Text style={styles.name}>{result.name}</Text>
-                <Text style={styles.type}>{result.type}</Text>
+            <TouchableOpacity
+              key={i}
+              onPress={() =>
+                navigation.navigate("Profile", {
+                  id: result.id,
+                })
+              }
+            >
+              <View style={styles.resultContainer}>
+                <Image
+                  style={styles.images}
+                  source={{
+                    uri: result.images[0]?.url,
+                  }}
+                />
+                <View>
+                  <Text style={styles.name}>{result.name}</Text>
+                  <Text style={styles.type}>{result.type}</Text>
+                </View>
               </View>
-            </View>
+            </TouchableOpacity>
           ))}
       </ScrollView>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#2D2D30",
     alignItems: "center",
-    paddingTop: 10,
   },
   searchContainer: {
     flexDirection: "row",
@@ -109,9 +117,7 @@ const styles = StyleSheet.create({
     borderColor: "white",
     height: 35,
   },
-  icon: {
-
-  },
+  icon: {},
   images: {
     width: 60,
     height: 60,

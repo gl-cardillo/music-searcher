@@ -13,6 +13,7 @@ import { Icon } from "@rneui/base";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Search } from "./component/Search";
+import { Profile } from "./component/Profile";
 
 const Stack = createNativeStackNavigator();
 
@@ -24,13 +25,28 @@ export default function App() {
           name="Search"
           component={Search}
           options={{
-            headerStyle: {
-              backgroundColor: "#2D2D30",
-            },
-            headerTintColor: "#fff",
-            headerTitleStyle: {
-              fontWeight: "bold",
-            },
+            header: ({ navigation }) => (
+              <View style={{ height: 70, backgroundColor: "#2D2D30" }}></View>
+            ),
+          }}
+        />
+        <Stack.Screen
+          name="Profile"
+          component={Profile}
+          options={{
+            header: ({ navigation }) => (
+              <View
+                style={{
+                  backgroundColor: "#2D2D30",
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  alignItems: "flex-start",
+                   
+                }}
+              >
+            
+              </View>
+            ),
           }}
         />
       </Stack.Navigator>
