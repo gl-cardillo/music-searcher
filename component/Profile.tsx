@@ -17,6 +17,8 @@ export const Profile = ({ route, navigation }: any) => {
 
   const [result, setResult] = useState<any>();
 
+  const [topTrack, setTopTrack] = useState<any>();
+
   const getArtist = async () => {
     try {
       const response = await axios.get(`${API_URL}/artists/${id}`, {
@@ -27,19 +29,30 @@ export const Profile = ({ route, navigation }: any) => {
       console.error(error);
     }
   };
-  const getTopTracks = () => {
-    
-  }
+  const getTopTracks = async () => {
+    try {
+      const response = await axios.get(
+        `${API_URL}/artists/${id}/top-tracks?market=eg`,
+        {
+          headers: { Authorization: `Bearer ${API_TOKEN}` },
+        }
+      );
+      setTopTrack(response.data.tracks);
+    } catch (error) {
+      console.error(error);
+    }
+  };
   useEffect(() => {
     getArtist();
+    getTopTracks();
   }, []);
-  console.log(result);
+  console.log(topTrack);
   return (
-    <View>
+    <ScrollView>
       {!!result && (
         <View>
           <Image
-            style={styles.images}
+            style={styles.artistImage}
             source={{
               uri: result.images[0]?.url,
             }}
@@ -51,13 +64,34 @@ export const Profile = ({ route, navigation }: any) => {
           >
             <Icon type="ant-design" name="left" color="white" size={30} />
           </TouchableOpacity>
-          <View>
-            <Text>Top Tracks</Text>
-
+          <View style={styles.topTrackContainer}>
+            <Text style={styles.topTrackTitle}>Top Tracks</Text>
+            {topTrack && (
+              <View>
+                {topTrack.slice(0, 5).map((track: any, i: number) => {
+                  return (
+                    <View key={i} style={styles.trackContainer}>
+                      <Text style={styles.rank}>{i + 1}</Text>
+                      <Image
+                        style={styles.images}
+                        source={{
+                          uri: track.album.images[0]?.url,
+                        }}
+                      />
+                      <View>
+                        <Text style={styles.songName}>{track.name}</Text>
+                        <Text style={styles.album}>{track.album.name}</Text>
+                      </View>
+                    </View>
+                  );
+                })}
+              </View>
+            )}
           </View>
+          
         </View>
       )}
-    </View>
+    </ScrollView>
   );
 };
 
@@ -68,11 +102,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingTop: 10,
   },
-
-  images: {
+  artistImage: {
     width: "100%",
     height: 340,
-    objectFit: 'fill'
+    objectFit: "fill",
   },
   goBack: {
     position: "absolute",
@@ -86,5 +119,35 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
     fontSize: 60,
+  },
+  topTrackContainer: {
+    paddingTop: 10,
+    backgroundColor: "#2D2D30",
+    paddingLeft: 10,
+    color: 'white'
+  },
+  rank: {color: 'white'},
+  trackContainer: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: 'center',
+    gap: 10,
+    marginTop: 15,
+  },
+  topTrackTitle: {
+    fontSize: 25,
+    color: "white",
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  images: { width: 60, height: 60 },
+  songName: {
+    fontWeight: "bold",
+    color: "white",
+    fontSize: 16,
+    marginBottom: 5,
+  },
+  album: {
+    color: "white",
   },
 });
