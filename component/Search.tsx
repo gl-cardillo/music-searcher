@@ -27,8 +27,7 @@ export const Search = ({ navigation }: any) => {
           `${API_URL}/search?q=${searchFormatted}&type=album%2Cartist%2Ctrack`,
           { headers: { Authorization: `Bearer ${API_TOKEN}` } }
         );
-        const { artists } = response.data;
-        setResults(artists.items);
+        setResults(response.data.artists.items);
       } catch (error) {
         console.error(error);
       }
