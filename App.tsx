@@ -10,6 +10,7 @@ import {
 import { useEffect, useState } from "react";
 import { API_URL, API_TOKEN } from "@env";
 import { Icon } from "@rneui/base";
+import axios from "axios";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Search } from "./component/Search";
@@ -18,6 +19,7 @@ import { Profile } from "./component/Profile";
 const Stack = createNativeStackNavigator();
 
 export default function App() {
+  axios.defaults.headers.common["Authorization"] = `Bearer ${API_TOKEN}`;
   return (
     <NavigationContainer>
       <Stack.Navigator>
@@ -41,11 +43,8 @@ export default function App() {
                   display: "flex",
                   justifyContent: "flex-end",
                   alignItems: "flex-start",
-                   
                 }}
-              >
-            
-              </View>
+              ></View>
             ),
           }}
         />

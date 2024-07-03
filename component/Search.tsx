@@ -19,13 +19,11 @@ export const Search = ({ navigation }: any) => {
 
   const getData = async (search: string) => {
     const searchFormatted = search.replaceAll(" ", "+");
-    console.log(search);
     setSearchText(search);
     if (search !== "") {
       try {
         const response = await axios.get(
-          `${API_URL}/search?q=${searchFormatted}&type=album%2Cartist%2Ctrack`,
-          { headers: { Authorization: `Bearer ${API_TOKEN}` } }
+          `${API_URL}/search?q=${searchFormatted}&type=album%2Cartist%2Ctrack`
         );
         setResults(response.data.artists.items);
       } catch (error) {
@@ -35,31 +33,36 @@ export const Search = ({ navigation }: any) => {
       setResults([]);
     }
   };
-  // console.log(results[0]);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      getData(searchText);
+    }, 200);
+
+    // Cleanup the timeout if searchText changes before 700ms
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchText]);
 
   const handleClear = () => {
     setSearchText("");
     setResults([]);
   };
+
   return (
     <View style={styles.container}>
       <View style={styles.searchContainer}>
-        <Icon name="search" color="white" style={styles.icon} />
+        <Icon name="search" color="white" />
         <TextInput
           style={styles.searchInput}
-          onChangeText={(txt) => getData(txt)}
+          onChangeText={(txt) => setSearchText(txt)}
           value={searchText}
           placeholder="Search.."
         />
         {searchText !== "" && (
           <TouchableOpacity onPress={handleClear}>
-            <Icon
-              name="remove"
-              color="white"
-              type="font-awesome"
-              size={15}
-              style={styles.icon}
-            />
+            <Icon name="remove" color="white" type="font-awesome" size={15} />
           </TouchableOpacity>
         )}
       </View>
@@ -96,7 +99,7 @@ export const Search = ({ navigation }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#2D2D30",
+    backgroundColor: "#1b1b1b",
     alignItems: "center",
   },
   searchContainer: {
@@ -116,7 +119,6 @@ const styles = StyleSheet.create({
     borderColor: "white",
     height: 35,
   },
-  icon: {},
   images: {
     width: 60,
     height: 60,
@@ -127,7 +129,7 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
   resultContainer: {
-    marginTop: 20,
+    marginBottom: 20,
     width: "70%",
     marginLeft: 20,
     display: "flex",
@@ -135,7 +137,6 @@ const styles = StyleSheet.create({
     gap: 10,
     alignItems: "center",
   },
-  infoContainer: {},
   name: {
     fontWeight: "bold",
     color: "white",

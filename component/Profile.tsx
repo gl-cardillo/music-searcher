@@ -21,9 +21,7 @@ export const Profile = ({ route, navigation }: any) => {
 
   const getArtist = async () => {
     try {
-      const response = await axios.get(`${API_URL}/artists/${id}`, {
-        headers: { Authorization: `Bearer ${API_TOKEN}` },
-      });
+      const response = await axios.get(`${API_URL}/artists/${id}`);
       setArtist(response.data);
     } catch (error) {
       console.error(error);
@@ -33,12 +31,8 @@ export const Profile = ({ route, navigation }: any) => {
   const getTopTracks = async () => {
     try {
       const response = await axios.get(
-        `${API_URL}/artists/${id}/top-tracks?market=eg`,
-        {
-          headers: { Authorization: `Bearer ${API_TOKEN}` },
-        }
+        `${API_URL}/artists/${id}/top-tracks?market=eg`
       );
-      console.log(response.data);
       setTopTrack(response.data.tracks);
     } catch (error) {
       console.error(error);
@@ -47,38 +41,41 @@ export const Profile = ({ route, navigation }: any) => {
 
   const getAlbum = async () => {
     try {
-      const response = await axios.get(`${API_URL}/artists/${id}/albums`, {
-        headers: { Authorization: `Bearer ${API_TOKEN}` },
-      });
+      const response = await axios.get(`${API_URL}/artists/${id}/albums`);
       setAlbums(response.data.items);
     } catch (error) {
       console.error(error);
     }
   };
+
   useEffect(() => {
     getArtist();
     getTopTracks();
     getAlbum();
   }, []);
+
   return (
-    <View>
+    <View style={styles.container}>
       <TouchableOpacity
         style={styles.goBack}
         onPress={() => navigation.goBack()}
       >
-        <Icon type="ant-design" name="left" color="white" size={30} />
+        <Icon type="ant-design" name="left" color="white" size={20} />
       </TouchableOpacity>
       <ScrollView>
         {!!artist && (
           <View>
-            <Image
-              style={styles.artistImage}
-              source={{
-                uri: artist.images[0]?.url,
-              }}
-            />
-            <Text style={styles.name}>{artist.name}</Text>
-
+            <View style={{position: 'relative', marginBottom:10}}>
+              <Image
+                style={styles.artistImage}
+                source={{
+                  uri: artist.images[0]?.url,
+                }}
+              />
+              <View style={styles.nameContainer}>
+                <Text style={styles.name}>{artist.name}</Text>
+              </View>
+            </View>
             <View style={styles.topTrackContainer}>
               <Text style={styles.topTrackTitle}>Top Tracks</Text>
               {topTrack && (
@@ -94,7 +91,9 @@ export const Profile = ({ route, navigation }: any) => {
                           }}
                         />
                         <View>
-                          <Text style={styles.songName}>{track.name}</Text>
+                          <Text numberOfLines={1} style={styles.songName}>
+                            {track.name}
+                          </Text>
                           <Text style={styles.album}>{track.album.name}</Text>
                         </View>
                       </View>
@@ -118,7 +117,9 @@ export const Profile = ({ route, navigation }: any) => {
                           }}
                         />
                         <View>
-                          <Text style={styles.songName}>{album.name}</Text>
+                          <Text numberOfLines={1} style={styles.songName}>
+                            {album.name}
+                          </Text>
                         </View>
                       </View>
                     );
@@ -135,32 +136,44 @@ export const Profile = ({ route, navigation }: any) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: "#2D2D30",
-    alignItems: "center",
-    paddingTop: 10,
+    backgroundColor: "#1b1b1b",
   },
   artistImage: {
     width: "100%",
-    height: 340,
+    height: 400,
     objectFit: "fill",
   },
   goBack: {
     position: "absolute",
-    top: 50,
-    left: 10,
+    top: 55,
+    left: 12,
+    zIndex: 100,
+    backgroundColor: "#00000057",
+    borderRadius: 100,
+    padding: 5,
+    paddingLeft: 4,
+    opacity: 0.9,
+  },
+  nameContainer: {
+    flexDirection: "row",
+    position: "absolute",
+    bottom: 8,
+    left: 20,
+    zIndex: 100,
   },
   name: {
-    position: "absolute",
-    top: 270,
-    left: 20,
     color: "#fff",
     fontWeight: "bold",
-    fontSize: 60,
+    fontSize: 45,
+    maxWidth: 340,
+    flex: 1,
+    flexShrink: 1,
+    flexWrap: "wrap",
   },
   topTrackContainer: {
-    paddingTop: 10,
-    backgroundColor: "#2D2D30",
+    paddingTop: 5,
+    paddingBottom: 25,
+    backgroundColor: "#1b1b1b",
     paddingLeft: 10,
     color: "white",
   },
@@ -170,20 +183,21 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
-    marginTop: 15,
+    marginTop: 12,
   },
   topTrackTitle: {
     fontSize: 25,
     color: "white",
     fontWeight: "bold",
-    marginBottom: 10,
+    marginBottom: 0,
   },
-  images: { width: 60, height: 60 },
+  images: { width: 55, height: 55 },
   songName: {
     fontWeight: "bold",
     color: "white",
     fontSize: 16,
     marginBottom: 5,
+    maxWidth: 300,
   },
   album: {
     color: "white",
