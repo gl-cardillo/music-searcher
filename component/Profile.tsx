@@ -11,13 +11,18 @@ import { useEffect, useState } from "react";
 import { API_URL, API_TOKEN } from "@env";
 import axios from "axios";
 import { Icon } from "@rneui/base";
+import {
+  SpotifyArtistType,
+  SpotifyTrackType,
+  SpotifyAlbumType,
+} from "../types/types";
 
 export const Profile = ({ route, navigation }: any) => {
   const { id } = route.params;
 
-  const [artist, setArtist] = useState<any>();
-  const [topTrack, setTopTrack] = useState<any>();
-  const [albums, setAlbums] = useState<any>();
+  const [artist, setArtist] = useState<SpotifyArtistType>();
+  const [topTrack, setTopTrack] = useState<SpotifyTrackType[]>();
+  const [albums, setAlbums] = useState<SpotifyAlbumType[]>();
 
   const getArtist = async () => {
     try {

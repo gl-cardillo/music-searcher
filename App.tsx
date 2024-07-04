@@ -19,7 +19,7 @@ import { Profile } from "./component/Profile";
 const Stack = createNativeStackNavigator();
 
 export default function App() {
-  axios.defaults.headers.common["Authorization"] = `Bearer ${API_TOKEN}`;
+ 
   return (
     <NavigationContainer>
       <Stack.Navigator>
@@ -28,7 +28,7 @@ export default function App() {
           component={Search}
           options={{
             header: ({ navigation }) => (
-              <View style={{ height: 70, backgroundColor: "#2D2D30" }}></View>
+              <View style={{ height: 70, backgroundColor: "#1b1b1b" }}></View>
             ),
           }}
         />

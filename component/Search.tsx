@@ -11,32 +11,41 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { API_URL, API_TOKEN } from "@env";
 import { Icon } from "@rneui/base";
+import { SearchResultType } from "../types/types";
 
 export const Search = ({ navigation }: any) => {
   const [searchText, setSearchText] = useState<string>("");
 
-  const [results, setResults] = useState<any>([]);
+  const [searchResults, setSearchResults] = useState<SearchResultType[]>([]);
 
-  const getData = async (search: string) => {
+  const getSearch = async (search: string) => {
     const searchFormatted = search.replaceAll(" ", "+");
     setSearchText(search);
     if (search !== "") {
       try {
+        axios.defaults.headers.common["Authorization"] = `Bearer ${API_TOKEN}`;
+
         const response = await axios.get(
           `${API_URL}/search?q=${searchFormatted}&type=album%2Cartist%2Ctrack`
         );
-        setResults(response.data.artists.items);
+
+        setSearchResults(response.data.artists.items);
       } catch (error) {
         console.error(error);
       }
     } else {
-      setResults([]);
+      setSearchResults([]);
     }
+  };
+
+  const handleClear = () => {
+    setSearchText("");
+    setSearchResults([]);
   };
 
   useEffect(() => {
     const handler = setTimeout(() => {
-      getData(searchText);
+      getSearch(searchText);
     }, 200);
 
     // Cleanup the timeout if searchText changes before 700ms
@@ -44,11 +53,6 @@ export const Search = ({ navigation }: any) => {
       clearTimeout(handler);
     };
   }, [searchText]);
-
-  const handleClear = () => {
-    setSearchText("");
-    setResults([]);
-  };
 
   return (
     <View style={styles.container}>
@@ -59,16 +63,17 @@ export const Search = ({ navigation }: any) => {
           onChangeText={(txt) => setSearchText(txt)}
           value={searchText}
           placeholder="Search.."
+          placeholderTextColor="gray"
         />
         {searchText !== "" && (
           <TouchableOpacity onPress={handleClear}>
-            <Icon name="remove" color="white" type="font-awesome" size={15} />
+            <Icon name="remove" color="white" type="font-awesome" size={20} />
           </TouchableOpacity>
         )}
       </View>
       <ScrollView style={styles.resultsContainer}>
-        {results.length > 0 &&
-          results.map((result: any, i: number) => (
+        {searchResults.length > 0 &&
+          searchResults.map((result: any, i: number) => (
             <TouchableOpacity
               key={i}
               onPress={() =>
@@ -117,6 +122,7 @@ const styles = StyleSheet.create({
     paddingRight: 30, // To make space for the clear icon
     color: "white",
     borderColor: "white",
+
     height: 35,
   },
   images: {
