@@ -15,6 +15,7 @@ import {
   SpotifyArtistType,
   SpotifyTrackType,
   SpotifyAlbumType,
+  SpotifyRelatedArtistType,
 } from "../types/types";
 
 export const Profile = ({ route, navigation }: any) => {
@@ -23,6 +24,8 @@ export const Profile = ({ route, navigation }: any) => {
   const [artist, setArtist] = useState<SpotifyArtistType>();
   const [topTrack, setTopTrack] = useState<SpotifyTrackType[]>();
   const [albums, setAlbums] = useState<SpotifyAlbumType[]>();
+  const [relatedArtists, setRelatedArtists] =
+    useState<SpotifyRelatedArtistType[]>();
 
   const getArtist = async () => {
     try {
@@ -44,9 +47,24 @@ export const Profile = ({ route, navigation }: any) => {
     }
   };
 
+  const getRelatedArtists = async () => {
+    try {
+      const response = await axios.get(
+        `${API_URL}/artists/${id}/related-artists`
+      );
+      console.log(response);
+      debugger;
+      setRelatedArtists(response.data.artists);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  console.log(relatedArtists);
   const getAlbum = async () => {
     try {
-      const response = await axios.get(`${API_URL}/artists/${id}/albums`);
+      const response = await axios.get(
+        `${API_URL}/artists/${id}/albums?limit=3`
+      );
       setAlbums(response.data.items);
     } catch (error) {
       console.error(error);
@@ -57,6 +75,7 @@ export const Profile = ({ route, navigation }: any) => {
     getArtist();
     getTopTracks();
     getAlbum();
+    getRelatedArtists();
   }, []);
 
   return (
@@ -70,7 +89,7 @@ export const Profile = ({ route, navigation }: any) => {
       <ScrollView>
         {!!artist && (
           <View>
-            <View style={{position: 'relative', marginBottom:10}}>
+            <View style={{ position: "relative", marginBottom: 10 }}>
               <Image
                 style={styles.artistImage}
                 source={{
@@ -81,11 +100,11 @@ export const Profile = ({ route, navigation }: any) => {
                 <Text style={styles.name}>{artist.name}</Text>
               </View>
             </View>
-            <View style={styles.topTrackContainer}>
-              <Text style={styles.topTrackTitle}>Top Tracks</Text>
+            <View style={styles.subContainer}>
+              <Text style={styles.title}>Top Tracks</Text>
               {topTrack && (
                 <View>
-                  {topTrack.slice(0, 5).map((track: any, i: number) => {
+                  {topTrack.slice(0, 3).map((track: any, i: number) => {
                     return (
                       <View key={i} style={styles.trackContainer}>
                         <Text style={styles.rank}>{i + 1}</Text>
@@ -107,8 +126,8 @@ export const Profile = ({ route, navigation }: any) => {
                 </View>
               )}
             </View>
-            <View style={styles.topTrackContainer}>
-              <Text style={styles.topTrackTitle}>Albums</Text>
+            <View style={styles.subContainer}>
+              <Text style={styles.title}>Albums</Text>
               {albums && (
                 <View>
                   {albums.slice(0, 5).map((album: any, i: number) => {
@@ -131,6 +150,32 @@ export const Profile = ({ route, navigation }: any) => {
                   })}
                 </View>
               )}
+            </View>
+          </View>
+        )}
+      </ScrollView>
+      <ScrollView horizontal={true} style={{ height: 200 }}>
+        {relatedArtists && (
+          <View style={{ paddingLeft: 10 }}>
+            <Text style={styles.title}>Related Artists</Text>
+            <View style={styles.relatedArtistContainer}>
+              {relatedArtists.map((artist: any, i: number) => {
+                return (
+                  <View key={i}>
+                    <Image
+                      style={styles.imagesRelatedArtists}
+                      source={{
+                        uri: artist.images[0]?.url,
+                      }}
+                    />
+                    <View>
+                      <Text numberOfLines={1} style={styles.songName}>
+                        {artist.name}
+                      </Text>
+                    </View>
+                  </View>
+                );
+              })}
             </View>
           </View>
         )}
@@ -175,12 +220,18 @@ const styles = StyleSheet.create({
     flexShrink: 1,
     flexWrap: "wrap",
   },
-  topTrackContainer: {
+  subContainer: {
     paddingTop: 5,
     paddingBottom: 25,
     backgroundColor: "#1b1b1b",
     paddingLeft: 10,
     color: "white",
+  },
+  relatedArtistContainer: {
+    flexDirection: "row",
+    gap: 20,
+    padding: 10,
+    backgroundColor: "#1b1b1b",
   },
   rank: { color: "white" },
   trackContainer: {
@@ -190,13 +241,14 @@ const styles = StyleSheet.create({
     gap: 10,
     marginTop: 12,
   },
-  topTrackTitle: {
+  title: {
     fontSize: 25,
     color: "white",
     fontWeight: "bold",
     marginBottom: 0,
   },
   images: { width: 55, height: 55 },
+  imagesRelatedArtists: { width: 120, height: 120, borderRadius: 100 },
   songName: {
     fontWeight: "bold",
     color: "white",
