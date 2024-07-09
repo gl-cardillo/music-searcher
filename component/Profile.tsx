@@ -52,14 +52,13 @@ export const Profile = ({ route, navigation }: any) => {
       const response = await axios.get(
         `${API_URL}/artists/${id}/related-artists`
       );
-      console.log(response);
-      debugger;
+
       setRelatedArtists(response.data.artists);
     } catch (error) {
       console.error(error);
     }
   };
-  console.log(relatedArtists);
+
   const getAlbum = async () => {
     try {
       const response = await axios.get(
@@ -153,13 +152,11 @@ export const Profile = ({ route, navigation }: any) => {
             </View>
           </View>
         )}
-      </ScrollView>
-      <ScrollView horizontal={true} style={{ height: 200 }}>
-        {relatedArtists && (
-          <View style={{ paddingLeft: 10 }}>
-            <Text style={styles.title}>Related Artists</Text>
+        <View style={{ height: 300, paddingLeft: 10 }}>
+          <Text style={styles.title}>Related Artists</Text>
+          <ScrollView horizontal style={{ height: "100%" }}>
             <View style={styles.relatedArtistContainer}>
-              {relatedArtists.map((artist: any, i: number) => {
+              {relatedArtists?.map((artist: any, i: number) => {
                 return (
                   <View key={i}>
                     <Image
@@ -177,8 +174,8 @@ export const Profile = ({ route, navigation }: any) => {
                 );
               })}
             </View>
-          </View>
-        )}
+          </ScrollView>
+        </View>
       </ScrollView>
     </View>
   );
