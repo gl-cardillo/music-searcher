@@ -73,7 +73,7 @@ export const Search = ({ navigation }: any) => {
       </View>
       <ScrollView style={styles.resultsContainer}>
         {searchResults.length > 0 &&
-          searchResults.map((result: any, i: number) => (
+          searchResults.map((result, i: number) => (
             <TouchableOpacity
               key={i}
               onPress={() =>

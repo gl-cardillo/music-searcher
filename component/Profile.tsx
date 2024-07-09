@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { useEffect, useState } from "react";
-import { API_URL, API_TOKEN } from "@env";
+import { API_URL } from "@env";
 import axios from "axios";
 import { Icon } from "@rneui/base";
 import {
@@ -103,7 +103,7 @@ export const Profile = ({ route, navigation }: any) => {
               <Text style={styles.title}>Top Tracks</Text>
               {topTrack && (
                 <View>
-                  {topTrack.slice(0, 3).map((track: any, i: number) => {
+                  {topTrack.slice(0, 3).map((track, i: number) => {
                     return (
                       <View key={i} style={styles.trackContainer}>
                         <Text style={styles.rank}>{i + 1}</Text>
@@ -129,7 +129,7 @@ export const Profile = ({ route, navigation }: any) => {
               <Text style={styles.title}>Albums</Text>
               {albums && (
                 <View>
-                  {albums.slice(0, 5).map((album: any, i: number) => {
+                  {albums.slice(0, 5).map((album, i: number) => {
                     return (
                       <View key={i} style={styles.trackContainer}>
                         <Text style={styles.rank}>{i + 1}</Text>
@@ -156,7 +156,7 @@ export const Profile = ({ route, navigation }: any) => {
           <Text style={styles.title}>Related Artists</Text>
           <ScrollView horizontal style={{ height: "100%" }}>
             <View style={styles.relatedArtistContainer}>
-              {relatedArtists?.map((artist: any, i: number) => {
+              {relatedArtists?.map((artist, i: number) => {
                 return (
                   <View key={i}>
                     <Image
